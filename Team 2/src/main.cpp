@@ -1,5 +1,6 @@
 //
 // Created by Jorge Enriquez on 3/17/23.
+// Updated by Renzo Pereyra on 04/14/23.
 //
 
 #include "vex.h"
@@ -15,11 +16,14 @@ controller Controller1 = controller(primary);
 // motor configurations
 // motor(port#, cartridge, reverse true or false)
 // blue motor ratio6_1, red motor ratio36_1, green motor ratio18_1
-motor LeftFront = motor(PORT1, ratio6_1, false);
+motor LeftFront = motor(PORT20, ratio6_1, false);
 motor LeftRear = motor(PORT2, ratio36_1, false);
-motor RightFront = motor(PORT3, ratio18_1, true);
+motor RightFront = motor(PORT11, ratio18_1, true);
 motor RightRear = motor(PORT4, ratio18_1, true);
 motor arm = motor(PORT5, ratio18_1, true);
+float WheelCircumference = (4.0 * 3.14159265); //Diameter of wheel * Pi
+float RevToAngle = (1/93); // 1 revolution turns 93 degrees
+int TurningSpeed = 45;
 
 
 /*---------------------------------------------------------------------------*/
@@ -39,8 +43,8 @@ void pre_auton(void) {
     // All activities that occur before the competition starts
     // Example: clearing encoders, setting servo positions, ...
 }
-
-
+double dist;
+double MotorDegrees = (dist /WheelCircumference)* 360;
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -51,10 +55,55 @@ void pre_auton(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
+
+void goFwd(float distance, double speed){
+    //double MotorDegrees = (distance /WheelCircumference)* 360;
+    //LeftFront.spinFor(fwd,MotorDegrees,rotationUnits::deg,speed,velocityUnits::pct,false);
+    //LeftRear.spinFor(fwd,MotorDegrees,rotationUnits::deg,speed,velocityUnits::pct,false);
+    //RightFront.spinFor(fwd,MotorDegrees,rotationUnits::deg,speed,velocityUnits::pct,false);
+    //RightRear.spinFor(fwd,MotorDegrees,rotationUnits::deg,speed,velocityUnits::pct);
+
+    LeftFront.startRotateFor(fwd,MotorDegrees,rotationUnits::deg,speed,velocityUnits::pct);
+    RightFront.rotateFor(fwd,MotorDegrees,rotationUnits::deg,speed,velocityUnits::pct);
+}
+void goBack(float distance, double speed){
+    double MotorDegrees = (distance /WheelCircumference)* 360;
+    //LeftFront.spinFor(directionType::rev,MotorDegrees,rotationUnits::deg,speed,velocityUnits::pct,false);
+    //LeftRear.spinFor(directionType::rev,MotorDegrees,rotationUnits::deg,speed,velocityUnits::pct,false);
+    //RightFront.spinFor(directionType::rev,MotorDegrees,rotationUnits::deg,speed,velocityUnits::pct,false);
+    //RightRear.spinFor(directionType::rev,MotorDegrees,rotationUnits::deg,speed,velocityUnits::pct);
+
+    LeftFront.startRotateFor(fwd,MotorDegrees,rotationUnits::deg,speed,velocityUnits::pct);
+    RightFront.rotateFor(fwd,MotorDegrees,rotationUnits::deg,speed,velocityUnits::pct);
+}
+void turnLeft(float degrees){
+    //turn MotorDegrees into RobotDegrees by testing
+    float NumberOfDegrees = degrees * RevToAngle * 360;
+    LeftFront.spinFor(directionType::rev,NumberOfDegrees,rotationUnits::deg,TurningSpeed,velocityUnits::pct, false);
+    LeftRear.spinFor(directionType::rev,NumberOfDegrees,rotationUnits::deg,TurningSpeed,velocityUnits::pct, false);
+    RightFront.spinFor(directionType::fwd,NumberOfDegrees,rotationUnits::deg,TurningSpeed,velocityUnits::pct, false);
+    RightRear.spinFor(directionType::fwd,NumberOfDegrees,rotationUnits::deg,TurningSpeed,velocityUnits::pct);
+}
+void turnRight(float degrees){
+    //turn MotorDegrees into RobotDegrees by testing
+    float NumberOfDegrees = degrees * RevToAngle * 360;
+    LeftFront.spinFor(directionType::fwd,NumberOfDegrees,rotationUnits::deg,TurningSpeed,velocityUnits::pct, false);
+    LeftRear.spinFor(directionType::fwd,NumberOfDegrees,rotationUnits::deg,TurningSpeed,velocityUnits::pct, false);
+    RightFront.spinFor(directionType::rev,NumberOfDegrees,rotationUnits::deg,TurningSpeed,velocityUnits::pct, false);
+    RightRear.spinFor(directionType::rev,NumberOfDegrees,rotationUnits::deg,TurningSpeed,velocityUnits::pct);
+}
+
 void autonomous(void) {
-    // ..........................................................................
-    // Insert autonomous user code here.
-    // ..........................................................................
+    //int counter = 1;
+    //int power = 11200;
+
+    LeftFront.startRotateFor(directionType::fwd, 260, rotationUnits::deg, 50, velocityUnits::pct);
+    RightFront.rotateFor(directionType::fwd, 260, rotationUnits::deg, 50, velocityUnits::pct);
+    //robot1.fly1.move_voltage(power);
+    goFwd(10,50);
+    goBack(10,50); //Go back 10 inches at a speed of 50
+    //goForward()
+
 }
 
 /*---------------------------------------------------------------------------*/
